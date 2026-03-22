@@ -9,6 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserRegister,UserDataSerializer
 from django.http import Http404
 from django.contrib.auth.models import User
+from rest_framework.generics import ListAPIView
+from rest_framework.filters import SearchFilter
 
 
 @api_view(['GET','POST','PUT'])
@@ -113,3 +115,17 @@ class UserDetails(APIView):
       user_data = self.get_object(pk)
       user_data.delete()
       return Response({"message":"user deleted"})
+   
+class SetPagination(PageNumberPagination):
+   page_size = 2
+
+
+class PaginationApi(ListAPIView):
+   queryset = User.objects.all()
+   serializer_class = UserDataSerializer
+   pagination_class = SetPagination
+   filter_backends = (SearchFilter,)
+   SearchFilter = ("username", "email","first_name","last_name")
+
+   
+
